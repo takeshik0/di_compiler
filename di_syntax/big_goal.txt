@@ -1,0 +1,25 @@
+
+int firstNum;
+get(firstNum);
+
+int secondNum;
+get(secondNum);
+
+char operator;
+get(operator);
+
+if(operator == '+') {
+    print(firstNum + secondNum);
+}
+
+if(operator == '-') {
+    print(firstNum + secondNum);
+}
+
+if(operator == '*') {
+    print(firstNum + secondNum);
+}
+
+if(operator == '/') {
+    print(firstNum + secondNum);
+}
