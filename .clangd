@@ -1,3 +1,0 @@
-CompileFlags:
-  Add:
-    - -I/home/dima/c++/di_compiler/include
