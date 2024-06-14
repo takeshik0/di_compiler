@@ -1,3 +1,6 @@
 .o
 .asm
 asm.o
+.vscode
+.clangd
+.ninja_log
