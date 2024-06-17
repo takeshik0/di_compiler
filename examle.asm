@@ -9,9 +9,9 @@ _start:
 	add eax, 11
 	cmp eax, 0
 	jge positive
-	neg eax
+	neg eax 
 	mov byte [result], '-'
-	;jmp convert_to_ascii
+	jmp convert_loop
 positive:
 	mov edi, buffer + 12
 	mov ebx, 10
