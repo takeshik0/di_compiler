@@ -30,6 +30,4 @@ int main(int argc, char** argv) {
     std::system("ld -m elf_i386 -o di di.o");
     std::system("./di");
     std::cout << "\n";
-
-
 };
