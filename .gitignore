@@ -1,6 +1,7 @@
-.o
-.asm
-asm.o
+*.o
+*.asm
+*asm
 .vscode
-.clangd
-.ninja_log
+*.clangd
+*.ninja_log
+s

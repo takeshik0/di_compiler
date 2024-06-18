@@ -20,9 +20,6 @@ enum class TokenType {
     KwPrint,
     KwInt,
     KwChar,
-
-
-    Count
 };
 
 struct Token {
@@ -41,7 +38,7 @@ public:
 
     {TokenType::OpAdd, "+"},
     {TokenType::OpSubtruct, "-"},
-    {TokenType::OpMultiply, "OpMultiply"},
+    {TokenType::OpMultiply, "*"},
     {TokenType::OpDivide, "/"},
 
     {TokenType::KwPrint, "print"},
