@@ -2,6 +2,7 @@ section .text
 	global _start
 _start:
 	mov eax, 2
+	imul eax, 3
 	add eax, 2
 	cmp eax, 0
 	jge positive

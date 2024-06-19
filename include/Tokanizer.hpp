@@ -1,6 +1,5 @@
 #pragma once
 #include <map>
-#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -22,7 +21,11 @@ enum class TokenType {
     KwChar,
 };
 
-struct Token {
+class Token {
+public:
+    bool operator==(Token other) const {
+        return this->type == other.type && this->value == other.value;
+    }
     TokenType type;
     std::string value;
 };

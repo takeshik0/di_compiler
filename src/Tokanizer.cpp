@@ -1,5 +1,4 @@
 #include "Tokanizer.hpp"
-#include <stdexcept>
 
 std::vector<Token> Tokanizer::tokanize(std::string& inputFilrString) {
 
