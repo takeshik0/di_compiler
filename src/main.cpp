@@ -29,8 +29,6 @@ int main(int argc, char** argv) {
                    std::ostream_iterator<std::string>(std::cout, " "),
                    [](const auto &value) { return value.value; });
 
-
-
     AsmCode converter;
     codeMap asmCode = converter.convertToAsm(tokenList);
     converter.writeCodeToFile(asmCode);

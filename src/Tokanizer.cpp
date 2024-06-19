@@ -32,6 +32,9 @@ std::vector<Token> Tokanizer::tokanize(std::string& inputFilrString) {
             case '*':
                 tokenList.push_back({TokenType::OpMultiply, StringTokens.at(TokenType::OpMultiply)});
                 break;
+            case '/':
+                tokenList.push_back({TokenType::OpDivide, StringTokens.at(TokenType::OpDivide)});
+                break;
             case ')':
                 tokenList.push_back({TokenType::PrentacisIsClose, StringTokens.at(TokenType::PrentacisIsClose)});
                 break;

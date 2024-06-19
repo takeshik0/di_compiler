@@ -15,6 +15,7 @@ std::string  AsmCode::getOperator(std::vector<Token>::iterator& element) {
                 tempOperator = "imul";
                 break;
             case TokenType::OpDivide:
+                tempOperator = "idiv";
                 break;
         }
     return tempOperator;
@@ -26,20 +27,41 @@ void AsmCode::calculateExpression(std::vector<Token>::iterator& currentElement, 
 
     while (currentElement->type != TokenType::PrentacisIsClose) {
         std::cout << currentElement->value;
-        if(currentElement->type == TokenType::KwInt) {
-            operands.push(*currentElement);
-        } else if(currentElement->type == TokenType::OpAdd || currentElement->type == TokenType::OpMultiply ) {
-            asmCode["_start:"].push_back(currOperator + " eax, " + operands.top().value);
-            operands.pop();
-            currOperator = getOperator(currentElement);
-        } else if (currentElement->type == TokenType::OpSubtruct || currentElement->type == TokenType::OpDivide) {
-            auto secondOrderValue = operands.top();
-            operands.pop();
-            auto firstOrderValue = operands.top();
-            operands.pop();
-            asmCode["_start:"].push_back(currOperator + " eax, " + firstOrderValue.value);
-            operands.push(secondOrderValue);
-            currOperator = getOperator(currentElement);
+        switch (currentElement->type) {
+            case TokenType::KwInt:
+                operands.push(*currentElement);
+                break;
+            case TokenType::OpAdd:
+            case TokenType::OpMultiply:
+                asmCode["_start:"].push_back(currOperator + " eax, " + operands.top().value);
+                operands.pop();
+                currOperator = getOperator(currentElement);
+                break;
+            case TokenType::OpSubtruct: {
+                auto secondOrderValue = operands.top();
+                operands.pop();
+                auto firstOrderValue = operands.top();
+                operands.pop();
+                asmCode["_start:"].push_back(currOperator + " eax, " + firstOrderValue.value);
+                operands.push(secondOrderValue);
+                currOperator = getOperator(currentElement);
+                break;
+            }
+            case TokenType::OpDivide: {
+                auto secondOrderValue = operands.top();
+                operands.pop();
+                auto firstOrderValue = operands.top();
+                operands.pop();
+                asmCode["_start:"].push_back(currOperator + " eax, " + firstOrderValue.value);
+                currOperator = getOperator(currentElement);
+                operands.push(secondOrderValue);
+                if (currOperator == "idiv") {
+                    asmCode["_start:"].push_back("mov ecx, " + operands.top().value);
+                    asmCode["_start:"].push_back("cdq");
+                    asmCode["_start:"].push_back("idiv ecx");
+                }
+                break;
+            }
         }
         ++currentElement;
     }

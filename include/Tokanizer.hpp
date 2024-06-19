@@ -48,7 +48,7 @@ public:
     {TokenType::KwPrint, "print"},
     {TokenType::KwInt, "int"},
     {TokenType::KwChar, "char"},
-};
+    };
 
-std::vector<Token> tokanize(std::string& inputFilrString);
+    std::vector<Token> tokanize(std::string& inputFilrString);
 };
