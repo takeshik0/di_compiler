@@ -4,4 +4,4 @@
 .vscode
 *.clangd
 *.ninja_log
-s
+build/

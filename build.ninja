@@ -8,11 +8,12 @@ rule compile
 rule link
     command = clang++ $in -o $out
 
-build Tokanizer.o: compile src/Tokanizer.cpp
-build AsmCode.o: compile src/AsmCode.cpp
-build main.o: compile src/main.cpp
+build build/Tokanizer.o: compile src/Tokanizer.cpp
+build build/AsmCode.o: compile src/AsmCode.cpp
+build build/Parser.o: compile src/Parser.cpp
+build build/main.o: compile src/main.cpp
 
-build asm: link Tokanizer.o main.o AsmCode.o
+build asm: link build/Tokanizer.o build/main.o build/AsmCode.o build/Parser.o
 
 default asm
 
