@@ -1,9 +1,8 @@
 section .text
 	global _start
 _start:
-	mov eax, 3
-	sub eax, 2
-	imul eax, 2
+	mov eax, 2
+	add eax, 2
 	cmp eax, 0
 	jge positive
 	neg eax
