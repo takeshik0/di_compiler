@@ -1,6 +1,5 @@
 #pragma once
 #include "Tokanizer.hpp"
-#include <stack>
 #include <algorithm>
 
 class Parser {

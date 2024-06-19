@@ -2,6 +2,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <stack>
 
 enum class TokenType {
     Unknown,

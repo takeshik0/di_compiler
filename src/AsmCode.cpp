@@ -1,33 +1,52 @@
 #include "AsmCode.hpp"
+#include "Tokanizer.hpp"
+#include <iostream>
 
-void AsmCode::calculateExpression(std::vector<Token>::iterator& it, codeMap& asmCode, std::string& currOperator) {
-    while (it->type != TokenType::PrentacisIsClose) {
-        switch (it->type) {
-            case TokenType::KwInt:
-                asmCode["_start:"].push_back(currOperator + " eax, " + it->value);
-                break;
+std::string  AsmCode::getOperator(std::vector<Token>::iterator& element) {
+    std::string tempOperator;
+    switch (element->type) {
             case TokenType::OpAdd:
-                currOperator = "add";
+                tempOperator = "add";
                 break;
             case TokenType::OpSubtruct:
-                currOperator = "sub";
+                tempOperator = "sub";
                 break;
             case TokenType::OpMultiply:
-                currOperator = "imul";
+                tempOperator = "imul";
                 break;
-            case TokenType::PrentacisIsOpen:
-                ++it;
-                calculateExpression(it, asmCode, currOperator);
-                break;
-            case TokenType::Unknown:
-            case TokenType::PrentacisIsClose:
-            case TokenType::IsSemicolon:
             case TokenType::OpDivide:
-            case TokenType::KwPrint:
-            case TokenType::KwChar:
-              break;
-            }
-        ++it;
+                break;
+        }
+    return tempOperator;
+}
+
+void AsmCode::calculateExpression(std::vector<Token>::iterator& currentElement, codeMap& asmCode) {
+    std::string currOperator = "mov";
+    std::stack<Token> operands;
+
+    while (currentElement->type != TokenType::PrentacisIsClose) {
+        std::cout << currentElement->value;
+        if(currentElement->type == TokenType::KwInt) {
+            operands.push(*currentElement);
+        } else if(currentElement->type == TokenType::OpAdd || currentElement->type == TokenType::OpMultiply ) {
+            asmCode["_start:"].push_back(currOperator + " eax, " + operands.top().value);
+            operands.pop();
+            currOperator = getOperator(currentElement);
+        } else if (currentElement->type == TokenType::OpSubtruct || currentElement->type == TokenType::OpDivide) {
+            auto secondOrderValue = operands.top();
+            operands.pop();
+            auto firstOrderValue = operands.top();
+            operands.pop();
+            asmCode["_start:"].push_back(currOperator + " eax, " + firstOrderValue.value);
+            operands.push(secondOrderValue);
+            currOperator = getOperator(currentElement);
+        }
+        ++currentElement;
+    }
+
+    if(!operands.empty()) {
+        asmCode["_start:"].push_back(currOperator + " eax, " + operands.top().value);
+        operands.pop();
     }
 }
 
@@ -36,10 +55,9 @@ codeMap AsmCode::convertToAsm(std::vector<Token>& tokenList) {
     asmCode["section .text"] = {"\n\tglobal _start"};
     asmCode["_start:"] = {""};
     keysOrder.emplace_back("_start:");
-    std::string currOperator = "mov";
-    for (auto it = tokenList.begin(); it != tokenList.end(); ++it)
+    for (auto currentElement = tokenList.begin(); currentElement != tokenList.end(); ++currentElement)
     {
-        if(it->type == TokenType::KwPrint) {
+        if(currentElement->type == TokenType::KwPrint) {
             
             asmCode["section .bss"] = {""};
             asmCode["section .bss"].push_back("buffer resb 12");
@@ -48,11 +66,11 @@ codeMap AsmCode::convertToAsm(std::vector<Token>& tokenList) {
             asmCode["section .data"] = {""};
             asmCode["section .data"].push_back("result db ' ', '0', 0xA");
             keysOrder.emplace_back("section .data");
-            ++it;
+            ++currentElement;
 
-            if (it->value == "(") {
-                ++it;
-                calculateExpression(it, asmCode, currOperator);
+            if (currentElement->value == "(") {
+                ++currentElement;
+                calculateExpression(currentElement, asmCode);
             }
             asmCode["_start:"].push_back("cmp eax, 0");
             asmCode["_start:"].push_back("jge positive");
