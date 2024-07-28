@@ -1,6 +1,7 @@
 #include "AsmCode.hpp"
 #include "Tokanizer.hpp"
 #include <iostream>
+#include <string>
 
 std::string  AsmCode::getOperator(std::vector<Token>::iterator& element) {
     std::string tempOperator;
@@ -23,52 +24,35 @@ std::string  AsmCode::getOperator(std::vector<Token>::iterator& element) {
 
 void AsmCode::calculateExpression(std::vector<Token>::iterator& currentElement, codeMap& asmCode) {
     std::string currOperator = "mov";
-    std::stack<Token> operands;
+    std::stack<int> operands;
 
     while (currentElement->type != TokenType::PrentacisIsClose) {
-        std::cout << currentElement->value;
-        switch (currentElement->type) {
-            case TokenType::KwInt:
-                operands.push(*currentElement);
-                break;
-            case TokenType::OpAdd:
-            case TokenType::OpMultiply:
-                asmCode["_start:"].push_back(currOperator + " eax, " + operands.top().value);
-                operands.pop();
-                currOperator = getOperator(currentElement);
-                break;
-            case TokenType::OpSubtruct: {
-                auto secondOrderValue = operands.top();
-                operands.pop();
-                auto firstOrderValue = operands.top();
-                operands.pop();
-                asmCode["_start:"].push_back(currOperator + " eax, " + firstOrderValue.value);
-                operands.push(secondOrderValue);
-                currOperator = getOperator(currentElement);
-                break;
-            }
-            case TokenType::OpDivide: {
-                auto secondOrderValue = operands.top();
-                operands.pop();
-                auto firstOrderValue = operands.top();
-                operands.pop();
-                asmCode["_start:"].push_back(currOperator + " eax, " + firstOrderValue.value);
-                currOperator = getOperator(currentElement);
-                operands.push(secondOrderValue);
-                if (currOperator == "idiv") {
-                    asmCode["_start:"].push_back("mov ecx, " + operands.top().value);
-                    asmCode["_start:"].push_back("cdq");
-                    asmCode["_start:"].push_back("idiv ecx");
-                }
-                break;
+        if(currentElement->type == TokenType::KwInt) {
+            operands.push(std::stoi(currentElement->value));
+        } else {
+            int firstOrderValue = operands.top();
+            operands.pop();
+            int secondOrderValue = operands.top();
+            operands.pop();
+            switch (currentElement->type) {
+                case TokenType::OpAdd:
+                    operands.push(secondOrderValue + firstOrderValue);
+                    break;
+                case TokenType::OpSubtruct:
+                    operands.push(secondOrderValue - firstOrderValue);
+                    break;
+                case TokenType::OpMultiply:
+                    operands.push(secondOrderValue * firstOrderValue);
+                    break;
+                case TokenType::OpDivide:
+                    operands.push(secondOrderValue / firstOrderValue);
+                    break;
             }
         }
         ++currentElement;
     }
-
     if(!operands.empty()) {
-        asmCode["_start:"].push_back(currOperator + " eax, " + operands.top().value);
-        operands.pop();
+        asmCode["_start:"].push_back(currOperator + " eax, " + std::to_string(operands.top()));
     }
 }
 
@@ -76,7 +60,8 @@ codeMap AsmCode::convertToAsm(std::vector<Token>& tokenList) {
     codeMap asmCode;
     asmCode["section .text"] = {"\n\tglobal _start"};
     asmCode["_start:"] = {""};
-    keysOrder.emplace_back("_start:");
+    
+    
     for (auto currentElement = tokenList.begin(); currentElement != tokenList.end(); ++currentElement)
     {
         if(currentElement->type == TokenType::KwPrint) {
@@ -89,11 +74,13 @@ codeMap AsmCode::convertToAsm(std::vector<Token>& tokenList) {
             asmCode["section .data"].push_back("result db ' ', '0', 0xA");
             keysOrder.emplace_back("section .data");
             ++currentElement;
-
+            
             if (currentElement->value == "(") {
                 ++currentElement;
                 calculateExpression(currentElement, asmCode);
             }
+            
+            keysOrder.emplace_back("_start:");
             asmCode["_start:"].push_back("cmp eax, 0");
             asmCode["_start:"].push_back("jge positive");
             asmCode["_start:"].push_back("neg eax");
@@ -124,6 +111,8 @@ codeMap AsmCode::convertToAsm(std::vector<Token>& tokenList) {
             asmCode["convert_loop:"].push_back("lea ecx, [result]");
             asmCode["convert_loop:"].push_back("mov edx, 1");
             asmCode["convert_loop:"].push_back("int 0x80");
+            asmCode["convert_loop:"].push_back("add ecx, 1");
+            asmCode["convert_loop:"].push_back("dec edx");
 
             asmCode["print_number:"] = {""};
             keysOrder.emplace_back("print_number:");

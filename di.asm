@@ -1,22 +1,16 @@
 section .text
 	global _start
+section .bss
+	buffer resb 12
+section .data
+	result db ' ', '0', 0xA
 _start:
-	mov eax, 1
-	add eax, 9
-	mov ecx, 3
-	cdq
-	idiv ecx
-	idiv eax, 3
-	add eax, 2
+	mov eax, 15
 	cmp eax, 0
 	jge positive
 	neg eax
 	mov byte [result], '-'
 	jmp convert_loop
-section .bss
-	buffer resb 12
-section .data
-	result db ' ', '0', 0xA
 positive:
 	mov edi, buffer + 12
 	mov ebx, 10
@@ -39,6 +33,8 @@ convert_loop:
 	lea ecx, [result]
 	mov edx, 1
 	int 0x80
+	add ecx, 1
+	dec edx
 print_number:
 	mov eax, 4
 	mov ebx, 1
