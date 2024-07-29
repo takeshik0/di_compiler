@@ -22,7 +22,7 @@ std::string  AsmCode::getOperator(std::vector<Token>::iterator& element) {
     return tempOperator;
 }
 
-void AsmCode::calculateExpression(std::vector<Token>::iterator& currentElement, codeMap& asmCode) {
+std::string AsmCode::calculateExpression(std::vector<Token>::iterator& currentElement, codeMap& asmCode) {
     std::string currOperator = "mov";
     std::stack<int> operands;
 
@@ -52,8 +52,9 @@ void AsmCode::calculateExpression(std::vector<Token>::iterator& currentElement, 
         ++currentElement;
     }
     if(!operands.empty()) {
-        asmCode["_start:"].push_back(currOperator + " eax, " + std::to_string(operands.top()));
+        return std::to_string(operands.top());
     }
+    return nullptr;
 }
 
 codeMap AsmCode::convertToAsm(std::vector<Token>& tokenList) {
@@ -66,62 +67,32 @@ codeMap AsmCode::convertToAsm(std::vector<Token>& tokenList) {
     {
         if(currentElement->type == TokenType::KwPrint) {
             
-            asmCode["section .bss"] = {""};
-            asmCode["section .bss"].push_back("buffer resb 12");
-            keysOrder.emplace_back("section .bss");
+            //asmCode["section .bss"] = {""};
+            //asmCode["section .bss"].push_back("buffer resb 12");
+            //keysOrder.emplace_back("section .bss");
 
-            asmCode["section .data"] = {""};
-            asmCode["section .data"].push_back("result db ' ', '0', 0xA");
-            keysOrder.emplace_back("section .data");
+            
             ++currentElement;
             
+            std::string msgToPrint = "";
+            std::cout << msgToPrint << std::endl;
             if (currentElement->value == "(") {
                 ++currentElement;
-                calculateExpression(currentElement, asmCode);
+                msgToPrint = calculateExpression(currentElement, asmCode);
             }
             
             keysOrder.emplace_back("_start:");
-            asmCode["_start:"].push_back("cmp eax, 0");
-            asmCode["_start:"].push_back("jge positive");
-            asmCode["_start:"].push_back("neg eax");
-            asmCode["_start:"].push_back("mov byte [result], '-'");
-            asmCode["_start:"].push_back("jmp convert_loop");
-            asmCode["positive:"] = {""};            
-            asmCode["positive:"].push_back("mov edi, buffer + 12");
-            asmCode["positive:"].push_back("mov ebx, 10");
-            keysOrder.emplace_back("positive:");
+            asmCode["_start:"].push_back("mov edx, " + std::to_string(msgToPrint.length()));
+            asmCode["_start:"].push_back("mov ecx, result");
+            asmCode["_start:"].push_back("mov ebx, 1");
+            asmCode["_start:"].push_back("mov eax, 4");
+            asmCode["_start:"].push_back("int 0x80");
+            asmCode["_start:"].push_back("mov eax, 1");
+            asmCode["_start:"].push_back("int 0x80");
 
-            asmCode["convert_loop:"] = {""};
-            keysOrder.emplace_back("convert_loop:");
-            asmCode["convert_loop:"].push_back("xor edx, edx");
-            asmCode["convert_loop:"].push_back("div ebx");
-            asmCode["convert_loop:"].push_back("add dl, '0'");
-            asmCode["convert_loop:"].push_back("dec edi");
-            asmCode["convert_loop:"].push_back("mov [edi], dl");
-            asmCode["convert_loop:"].push_back("test eax, eax");
-            asmCode["convert_loop:"].push_back("jnz convert_loop");
-            asmCode["convert_loop:"].push_back("mov eax, buffer + 12");
-            asmCode["convert_loop:"].push_back("sub eax, edi");
-            asmCode["convert_loop:"].push_back("mov edx, eax");
-            asmCode["convert_loop:"].push_back("mov ecx, edi");
-            asmCode["convert_loop:"].push_back("cmp byte [result], '-'");
-            asmCode["convert_loop:"].push_back("jne print_number");
-            asmCode["convert_loop:"].push_back("mov eax, 4");
-            asmCode["convert_loop:"].push_back("mov ebx, 1");
-            asmCode["convert_loop:"].push_back("lea ecx, [result]");
-            asmCode["convert_loop:"].push_back("mov edx, 1");
-            asmCode["convert_loop:"].push_back("int 0x80");
-            asmCode["convert_loop:"].push_back("add ecx, 1");
-            asmCode["convert_loop:"].push_back("dec edx");
-
-            asmCode["print_number:"] = {""};
-            keysOrder.emplace_back("print_number:");
-            asmCode["print_number:"].push_back("mov eax, 4");
-            asmCode["print_number:"].push_back("mov ebx, 1");
-            asmCode["print_number:"].push_back("int 0x80");
-            asmCode["print_number:"].push_back("\tmov eax, 1");
-            asmCode["print_number:"].push_back("xor ebx, ebx");
-            asmCode["print_number:"].push_back("int 0x80");
+            asmCode["section .data"] = {""};
+            asmCode["section .data"].push_back("result db '" + msgToPrint + "', 0xA");
+            keysOrder.emplace_back("section .data");
         }
     }
     return asmCode;
