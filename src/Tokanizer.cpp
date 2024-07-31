@@ -7,16 +7,20 @@ std::vector<Token> Tokanizer::tokanize(std::string& inputFilrString) {
         if (std::isspace(inputFilrString[pos]) || inputFilrString[pos] == '\n') { continue; }
         
         const auto PRINT_WORD = StringTokens.at(TokenType::KwPrint);
+        const auto INT_WORD = StringTokens.at(TokenType::IntVariable);
         if (inputFilrString.compare(pos, PRINT_WORD.size(), PRINT_WORD) == 0) {
             tokenList.push_back({TokenType::KwPrint, PRINT_WORD});
             pos += PRINT_WORD.size();
+        //} else if (inputFilrString.compare(pos, INT_WORD.size(), INT_WORD) == 0) {
+            //tokenList.push_back({TokenType::IntVariable, INT_WORD});
+            //pos += INT_WORD.size();
         } else if(std::isdigit(inputFilrString[pos])) {
             std::string num;
-            while(std::isdigit(inputFilrString[pos])) {
+            while(inputFilrString[pos] != '=') {
                 num.push_back(inputFilrString[pos]);
                 pos++;
             }
-            tokenList.push_back({TokenType::KwInt, num});
+            tokenList.push_back({TokenType::IntegerValue, num});
         }
 
         switch (inputFilrString[pos]) {

@@ -27,7 +27,7 @@ std::string AsmCode::calculateExpression(std::vector<Token>::iterator& currentEl
     std::stack<int> operands;
 
     while (currentElement->type != TokenType::PrentacisIsClose) {
-        if(currentElement->type == TokenType::KwInt) {
+        if(currentElement->type == TokenType::IntegerValue) {
             operands.push(std::stoi(currentElement->value));
         } else {
             int firstOrderValue = operands.top();
@@ -76,9 +76,13 @@ codeMap AsmCode::convertToAsm(std::vector<Token>& tokenList) {
             
             std::string msgToPrint = "";
             std::cout << msgToPrint << std::endl;
-            if (currentElement->value == "(") {
+            if (currentElement->value == "(" ) {
                 ++currentElement;
-                msgToPrint = calculateExpression(currentElement, asmCode);
+                if(currentElement->value == ")") {
+                    msgToPrint = "";
+                } else {
+                    msgToPrint = calculateExpression(currentElement, asmCode);
+                }
             }
             
             keysOrder.emplace_back("_start:");

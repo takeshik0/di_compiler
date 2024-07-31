@@ -28,14 +28,13 @@ int main(int argc, char** argv) {
     std::transform(tokenList.begin(), tokenList.end(),
                    std::ostream_iterator<std::string>(std::cout, " "),
                    [](const auto &value) { return value.value; });
+    std::cout << "\n";
 
-    AsmCode converter;
-    codeMap asmCode = converter.convertToAsm(tokenList);
-    converter.writeCodeToFile(asmCode);
-    
-    std::cout << "\n";
-    std::system("nasm -f elf32 -o di.o di.asm"); 
-    std::system("ld -m elf_i386 -o di di.o");
-    std::system("./di");
-    std::cout << "\n";
+    //AsmCode converter;
+    //codeMap asmCode = converter.convertToAsm(tokenList);
+    //converter.writeCodeToFile(asmCode);
+    //
+    //std::system("nasm -f elf32 -o di.o di.asm"); 
+    //std::system("ld -m elf_i386 -o di di.o");
+    //std::system("./di");
 };

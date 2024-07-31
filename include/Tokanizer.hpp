@@ -18,7 +18,8 @@ enum class TokenType {
     
 
     KwPrint,
-    KwInt,
+    IntVariable,
+    IntegerValue,
     KwChar,
 };
 
@@ -46,7 +47,8 @@ public:
     {TokenType::OpDivide, "/"},
 
     {TokenType::KwPrint, "print"},
-    {TokenType::KwInt, "int"},
+    {TokenType::IntVariable, "int"},
+    {TokenType::IntegerValue, "number"},
     {TokenType::KwChar, "char"},
     };
 
