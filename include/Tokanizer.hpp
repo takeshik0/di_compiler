@@ -53,4 +53,6 @@ public:
     };
 
     std::vector<Token> tokanize(std::string& inputFilrString);
+
+    bool isValidVariableSymbol(char symbol);
 };
